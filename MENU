@@ -1,0 +1,163 @@
+from archivo1 import *
+ballotage = False
+contador_votos_total = 0
+carga_votos = False
+validacion_porcentaje = False
+while True:
+    print("\n 1.Cargar voto \n 2.Mostrar votos \n 3.Turno mañana mayor a menor \n 4.No lo voto nadie\n 5.Turnos de mayor a menor \n 6.Ballotage \n 7.Salir\n")
+    opcion = int(input(" Ingrese una opcion: "))
+    if opcion == 1:
+        if validacion_porcentaje == False:    
+            carga_votos = cargar_votos(listas_partidos)
+    
+        else:
+            print("((Datos ya gestionados.))")
+    
+    if opcion == 2:
+       col = 0  # Contador para almacenamiento en porcentaje_menor_a_5.
+       indice = 111  # Código de la primera lista a mostrar porcentajes.
+       index = 111  # Código de la lista para imprimir resultados.
+
+       # Verifica si se han ingresado votos antes de mostrar resultados.
+       while carga_votos == False:
+           print("\n((Primero tiene que ingresar votos para poder mostrarlos.))")
+           break  # Sale del bucle si no se han ingresado votos.
+
+       # Si hay votos ingresados, se procede a mostrar los datos.
+       if carga_votos == True:
+            # Comprueba si ya se han mostrado los porcentajes antes para evitar duplicados.
+            if validacion_porcentaje == True:
+                print("\n((Datos ya mostrados en pantalla.))")
+            else:
+                validacion_porcentaje = True  # Marca que los datos han sido mostrados.
+                
+                # Suma el total de votos de todas las listas en todos los turnos.
+                for fila in listas_partidos:
+                    for columna in fila:
+                        contador_votos_total += columna
+                
+                print("///////////////////")
+                # Define los nombres de los turnos para mostrar.
+                turnos = ["Mañana", "Tarde", "Noche"]
+                
+                # Itera sobre cada lista de partidos y sus votos en cada turno.
+                for i in range(len(listas_partidos)):                 
+                    print(f"Lista {index}:")  # Muestra el código de la lista actual.
+                    index += 111  # Incrementa para el siguiente código de lista.
+                    # Muestra la cantidad de votos de cada turno en la lista actual.
+                    for j in range(len(turnos)):
+                        print(f"  {turnos[j]}: {listas_partidos[i][j]}")
+                    print("///////////////////")  # Espacio entre cada lista.
+                
+                # Acumula los votos de cada lista en el acumulador general y muestra resultados totales
+                for i in range(5):
+                    total = guardar_total(listas_partidos,i)
+                    acumulador_de_votos_general[0][i] = total
+                    print(f"Total Lista {111 + i * 111}: {acumulador_de_votos_general[0][i]} votos")
+                print("///////////////////")
+
+                # Si el total de votos es mayor que cero, calcula los porcentajes.
+                if contador_votos_total > 0:
+                    # Calcula el porcentaje de votos para cada lista.
+                    porcentajes = [(voto / contador_votos_total) * 100 for voto in acumulador_de_votos_general[0]]
+                    
+                    # Muestra el porcentaje de cada lista.
+                    for porcentaje in porcentajes:
+                        print(f"La lista {indice} tiene un porcentaje de: {round(porcentaje, 2)}%")
+                        
+                        # Si el porcentaje es menor o igual a 5%, lo almacena en porcentaje_menor_a_5.
+                        if porcentaje <= 5:
+                            porcentaje_menor_a_5[0][col] = f"La lista {indice} tiene un porcentaje de: %{round(porcentaje, 2)} y es menor a %5" 
+                            col += 1
+                        # Si el porcentaje es mayor o igual a 51%, evita el ballotage.
+                        if porcentaje >= 51:
+                            lista_mayor_porcentaje[0] = f"La lista {indice} tiene un porcentaje de: %{round(porcentaje, 2)} evita el ballotage."
+                        indice += 111  # Incrementa al siguiente código de lista.
+                # Si no hay votos, muestra que el porcentaje es 0% para cada lista.
+                else:
+                    print("El porcentaje de cada lista es %0")
+
+    if opcion == 3:            
+        # Verifica si se han ingresado votos antes de mostrar los datos del turno de la mañana.
+        while carga_votos == False:
+            print("\n((Primero tiene que ingresar votos para mostrar el orden del turno mañana.))")
+            break  # Sale del bucle si no hay votos ingresados.
+
+        # Si se han ingresado votos, procede a ordenar y mostrar el turno de la mañana.
+        if carga_votos == True:
+            # Llama a la función para ordenar los votos del turno de la mañana en orden mayor a menor.
+            ordenar_lista_mayor_a_menor_solo_la_columna_1(mayor_menor_turno_mañana)
+            print(" ((Turno mañana mayor a menor))\n") 
+            mostrar_primer_columna(mayor_menor_turno_mañana,"((El resto de listas no tiene votos del turno mañana.)) ")
+
+ 
+    if opcion == 4:
+        # Verifica si se han ingresado votos antes de mostrar las listas sin votos.
+        while carga_votos == False:
+            print("\n((Primero tiene que ingresar votos para poder mostrar a quien no voto nadie.))")
+            break  # Sale del bucle si no hay votos registrados.
+
+        # Si se han ingresado votos, procede con la verificación de porcentajes.
+        if carga_votos == True:
+            
+            # Comprueba si ya se calculó el porcentaje al seleccionar la opción 2.
+            if validacion_porcentaje == True:
+                # Itera a través de los índices de porcentaje_menor_a_5 para mostrar listas con menos de 5% de votos.
+                for ind in range(5):
+                    # Imprime las listas con porcentaje menor al 5%, si existe información en el índice correspondiente.
+                    if porcentaje_menor_a_5[0][ind] != 0:
+                        print(porcentaje_menor_a_5[0][ind])
+            else:
+                print("\n((Primero seleccione la opcion 2 para saber los votos.))")  # Informa al usuario que debe calcular los porcentajes primero.
+            
+
+
+    if opcion == 5:
+            while carga_votos == False: # Verifica si se han cargado votos antes de proceder
+                print("\nPrimero tiene que ingresar votos para poder mostrar que turno fue el mas votado. ")
+                break 
+            if carga_votos==True: # Si los votos están cargados, procede a ordenar y mostrar los turnos
+                ordenar_lista_mayor_a_menor_solo_la_columna_1(acumulador_de_turnos)
+                print(" Estas son los turnos de mayor a menor\n")
+                mostrar_primer_columna(acumulador_de_turnos," El resto de turnos no tiene votos.") # Muestra los turnos con votos
+
+
+    if opcion == 6:
+        if lista_mayor_porcentaje [0] == 0: # Verifica si no hay ningún porcentaje de lista mayor registrado
+            while carga_votos == False: # Comprueba si se han cargado votos antes de verificar ballotage
+                print("\nPrimero tiene que ingresar votos para saber si hay ballotage. ")
+                break
+            if carga_votos == True : # Si los votos están cargados, procede a calcular el ballotage
+                import random
+                print(" Hay ballotage.")
+                primero, indice_primero, segundo, indice_segundo = ordenar_mayor_a_menor(acumulador_de_votos_general) # Encuentra los dos mayores valores de votos y sus índices
+                # Imprimimos los máximos y sus índices, le sumamos 1 y lo multiplicamos para encontrar el numero de lista exacto.  
+                print(" ((En la primer vuelta)) ")
+                if primero == segundo:
+                    print(" Ambas listas tienen el mismo número de votos.")
+                    print(f" lista{111*(indice_primero+1)}: {primero}")
+                    print(f" lista{111*(indice_segundo+1)}: {segundo}")                   
+                else:
+                    print(f" Lista mas votada es la de {111*(indice_primero+1)} con los votos: {primero}\n Segunda lista es la de {111*(indice_segundo+1)} con los votos: {segundo}") 
+                print("((Segunda vuelta))")
+                total_votos = guardar_total(acumulador_de_votos_general, 0)
+                votos_lista_1 = random.randint(0, total_votos)
+                votos_lista_2 = total_votos - votos_lista_1                
+                if votos_lista_1 >= votos_lista_2:
+                    lista_ganadora = indice_primero
+                    votos_ganados = votos_lista_1
+                else:
+                    lista_ganadora = indice_segundo
+                    votos_ganados = votos_lista_2
+                
+                print("((Lista ganadora del ballotage))")# Imprime el resultado final
+                print(f"Lista más votada es la de {111 * (lista_ganadora + 1)} con {votos_ganados} votos a favor.\n")# Imprime el resultado final
+                ballotage = True          
+                opcion = 7
+        else:  
+            print( f"(({lista_mayor_porcentaje[0]}))")
+    if opcion == 7 or ballotage == True:
+        print("Saliendo del programa...")
+        break  
+    else :
+        print("\n((Vuelva a ingresar una opcion en el rango (1..7)))")
