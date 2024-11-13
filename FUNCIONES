@@ -1,0 +1,165 @@
+
+def inicializar_matriz(cantidad_filas:int, cantidad_columnas:int): 
+    """
+    Crea e inicializa una matriz de dimensiones especificadas con ceros"""
+    matriz = []
+
+    for i in range(cantidad_filas):
+        fila = [0] * cantidad_columnas
+        matriz += [fila]
+    
+    return matriz
+lista_mayor_porcentaje = [0]
+porcentaje_menor_a_5 = inicializar_matriz(1,5)
+listas_partidos = inicializar_matriz(5,3)
+acumulador_de_votos_general = inicializar_matriz(1,5)
+mayor_menor_turno_mañana = inicializar_matriz (5,2)
+acumulador_de_turnos = inicializar_matriz (3,2)
+
+def pedir_numero(mensaje:str,mensaje_error:str,minimo:int,maximo:int)->int:
+    """Solicita al usuario un número entero dentro de un rango específico."""
+    numero_ingresado = int(input(mensaje))
+    while not (minimo <= numero_ingresado <= maximo):
+        numero_ingresado = int(input(mensaje_error))
+    return numero_ingresado
+
+def guardar_total(matriz:list,fila:int):
+    """Esta funcion pide una matriz y el numero de fila, recorre fila de la matriz y suma el total en una variable """
+    total= 0 
+    for elemento in matriz[fila]: 
+        total += elemento  
+
+    return total  
+
+def ordenar_mayor_a_menor(matriz: list) -> tuple:
+    """
+    Esta función recorre la primera fila de la matriz, encuentra el valor máximo
+    y el segundo valor máximo , y retorna ambos valores con sus índices.
+    """
+    fila = matriz[0]
+    max1 = -float('inf') 
+    index_max1 = -1 
+    max2 = -float('inf')  
+    index_max2 = -1  
+    # Recorremos la fila para encontrar el máximo y el segundo máximo
+    for i in range(len(fila)):
+        if fila[i] > max1:
+            max2 = max1  # 
+            index_max2 = index_max1 
+            max1 = fila[i] 
+            index_max1 = i 
+        elif fila[i] > max2:
+            max2 = fila[i]  
+            index_max2 = i 
+
+    return max1, index_max1, max2, index_max2
+
+def ordenar_lista_mayor_a_menor_solo_la_columna_1(lista:int)->list:
+    """Esta funcion pide una matriz con fila y columna, ordena la conlumna del indice 0 de menor a mayor. """
+    for ind in range(len(lista) - 1):  # Iterar sobre las filas
+        for fila in range(ind + 1, len(lista)):
+            # Comparar solo el valor de la columna 0 de cada fila
+            if lista[ind][0] < lista[fila][0]:
+                # Intercambiar las filas completas si el valor en columna 0 de ind es menor que en fila
+                auxiliar = lista[ind]
+                lista[ind] = lista[fila]
+                lista[fila] = auxiliar
+    return lista
+
+def mostrar_primer_columna (lista,comentario):
+    """Imprime los valores de la primera columna de una lista bidimensional 
+    si el valor en la segunda columna no es cero. Si todos los valores de 
+    la segunda columna son cero, imprime un comentario una sola vez."""
+    contador = 0
+    for i in range(len(lista)):
+        if lista[i][1] != 0:   
+            print(f"{lista[i][1]}: {lista[i][0]}\n")  # Imprime solo el valor de la columna 0 de cada fila 
+        elif contador == 0 :    
+            print(comentario)  
+            contador += 1 
+    return ""
+
+def cargar_votos(lista_a_cargar: list) -> int:
+    """Carga votos en la matriz 'X' en función de lista y turno ingresados."""
+    # Solicita al usuario que elija una lista de votos (códigos válidos: 111, 222, 333, 444, 555).
+
+    
+    # Verifica que el código ingresado tenga exactamente 3 caracteres y sea uno de los códigos válidos.
+    while len(lista) != 3 or lista not in ["111", "222", "333", "444", "555"]:
+        lista = input("((ERROR)) Para que lista desea ingresar votos (111/222/333/444/555): ")
+
+    # Advierte al usuario que si repite el turno y la lista, los votos anteriores se sobrescriben.
+    print("\n(((Si repite turno y lista los votos se sobreescriben)))")
+    # Muestra las opciones de turno: Mañana, Tarde, Noche.
+    turno = pedir_numero("Ingrese numero de turno (1: MAÑANA, 2: TARDE, 3: NOCHE): ","((Invalido)) Ingrese numero de turno: ",1,3)
+    
+    
+    # Solicita la cantidad de votos y asegura que sea un número positivo.
+    votos = pedir_numero("Ingresar votos: ","((ERROR)) Ingresar votos: ",1,float('inf'))
+    # Muestra el turno que el usuario eligió en forma de texto.
+    if turno == 1:
+        print(f"Turno que eligio: MAÑANA")
+    elif turno == 2:
+        print(f"Turno que eligio: TARDE")
+    elif turno == 3:
+        print(f"Turno que eligio: NOCHE")
+
+    # Muestra el código de lista y el número de votos ingresado.
+    print(f"Lista que ingreso: {lista}")
+    print(f"Votos que ingreso: {votos}")
+
+    # Pregunta si el usuario desea confirmar y gestionar los votos ingresados.
+    if input("¿Desea gestionar estos votos? si/no: ").lower() == "si":
+        # Según el turno, agrega los votos en el acumulador correspondiente y registra una descripción.
+        if turno == 1:
+            # Llama a la función para gestionar los votos específicos del turno mañana.
+            carga_secuencial_de_votos(lista_a_cargar, votos, lista,turno-1," Estos son los votos del turno mañana" )
+        
+        elif turno == 2:
+            # Llama a la función para gestionar los votos específicos del turno tarde.
+            carga_secuencial_de_votos(lista_a_cargar, votos, lista,turno-1," Estos son los votos del turno tarde" )
+    
+        elif turno == 3:
+            # Llama a la función para gestionar los votos específicos del turno noche.
+            carga_secuencial_de_votos(lista_a_cargar, votos, lista,turno-1," Estos son los votos del turno noche" )
+
+        # Devuelve True para indicar que los votos fueron gestionados.
+        retorno = True
+        return retorno
+
+    # Si el usuario decide no gestionar los votos, devuelve False.
+    else:
+        retorno = False
+        return retorno
+
+def carga_secuencial_de_votos(listas_de_partidos:list, votos:int, lista:str,turno:int,comentario2:str) -> list:
+    """ Carga secuencial de votos en una lista de partidos, asignando valores a las columnas correspondientes 
+    según el identificador de la lista (111, 222, etc.), y actualiza un acumulador de votos por turno."""
+    #Dependiendo la lista que se coloque, se asigna un numero para la carga secuencial.
+    comentario = f" Estos son los votos de la lista {lista}"  
+    if lista == "111":
+        lista_fila = 0
+    
+    elif lista == "222":
+        lista_fila = 1
+    
+    elif lista == "333":
+        lista_fila = 2
+    
+    elif lista =="444":
+        lista_fila = 3
+    
+    elif lista == "555":
+        lista_fila = 4
+
+    # Almacena el número de votos y una descripción en 'mayor_menor_turno_mañana'.
+    if turno == 0:   
+        mayor_menor_turno_mañana[lista_fila][turno] = votos
+        mayor_menor_turno_mañana[lista_fila][1] = comentario
+
+    listas_de_partidos[lista_fila][turno] = votos #Carga secuencial de los votos, las listas van por fila, y los turnos por las columnas. 5x3
+    acumulador_de_turnos[turno][0] += votos  # Carga secuencial de todos los turnos, los turnos van por fila y los valores por columnas. 3x2
+    acumulador_de_turnos[turno][1] = comentario2
+    return listas_de_partidos,mayor_menor_turno_mañana,acumulador_de_turnos
+
+
